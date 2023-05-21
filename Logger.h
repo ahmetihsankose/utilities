@@ -15,6 +15,8 @@
 #include <mutex>
 #include "Exception.h"
 
+#define CONSOLE_DEBUG 1
+
 class Logger;
 
 enum class LogLevel
@@ -89,7 +91,9 @@ public:
         default:
             colorCode = "\033[0m"; // Reset
         }
+#if CONSOLE_DEBUG
         std::cout << colorCode << message << "\033[0m" << std::endl; // Reset color after message
+#endif
     }
 };
 
