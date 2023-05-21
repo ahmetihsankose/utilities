@@ -266,8 +266,19 @@ CMakeFiles/test.dir/main.cpp.o: ../main.cpp \
   /usr/include/c++/11/bits/parse_numbers.h \
   /usr/include/c++/11/mutex \
   /usr/include/c++/11/bits/unique_lock.h \
-  /home/kose/workspace/utilities/Exception.h
+  /home/kose/workspace/utilities/Exception.h \
+  /home/kose/workspace/utilities/RingBuffer.h \
+  /usr/include/c++/11/map \
+  /usr/include/c++/11/bits/stl_tree.h \
+  /usr/include/c++/11/bits/node_handle.h \
+  /usr/include/c++/11/bits/stl_map.h \
+  /usr/include/c++/11/bits/stl_multimap.h \
+  /usr/include/c++/11/bits/erase_if.h
 
+
+/usr/include/c++/11/bits/stl_map.h:
+
+/usr/include/c++/11/map:
 
 /home/kose/workspace/utilities/Exception.h:
 
@@ -284,6 +295,8 @@ CMakeFiles/test.dir/main.cpp.o: ../main.cpp \
 /usr/include/stdlib.h:
 
 /usr/include/c++/11/backward/binders.h:
+
+/usr/include/c++/11/bits/node_handle.h:
 
 /usr/include/c++/11/iostream:
 
@@ -416,6 +429,8 @@ CMakeFiles/test.dir/main.cpp.o: ../main.cpp \
 /usr/include/linux/errno.h:
 
 /usr/include/c++/11/bits/stringfwd.h:
+
+/usr/include/c++/11/bits/stl_multimap.h:
 
 ../main.cpp:
 
@@ -579,6 +594,8 @@ CMakeFiles/test.dir/main.cpp.o: ../main.cpp \
 
 /usr/include/x86_64-linux-gnu/bits/waitflags.h:
 
+/usr/include/c++/11/bits/erase_if.h:
+
 /usr/include/c++/11/bits/ptr_traits.h:
 
 /usr/include/stdint.h:
@@ -659,11 +676,15 @@ CMakeFiles/test.dir/main.cpp.o: ../main.cpp \
 
 /usr/include/asm-generic/errno.h:
 
+/usr/include/c++/11/bits/stl_tree.h:
+
 /usr/include/syscall.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/error_t.h:
 
 /usr/include/c++/11/bits/charconv.h:
+
+/home/kose/workspace/utilities/RingBuffer.h:
 
 /usr/include/c++/11/bits/basic_string.tcc:
 

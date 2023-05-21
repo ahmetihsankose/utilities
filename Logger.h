@@ -14,7 +14,9 @@
 #include <ctime>
 #include <mutex>
 #include "Exception.h"
+#include "RingBuffer.h"
 
+#define BUFFER_SIZE 64
 #define CONSOLE_DEBUG 1
 
 class Logger;
@@ -143,7 +145,6 @@ std::string format_string(const std::string &message, Args &&...args)
     }
 }
 
-
 class Logger
 {
 public:
@@ -160,6 +161,7 @@ public:
 
     void addOutput(std::unique_ptr<LogOutput> output)
     {
+        std::lock_guard<std::mutex> lock(logMutex);
         outputs.push_back(std::move(output));
     }
 
@@ -207,19 +209,22 @@ public:
 
         formattedMessage = formatter->format(formattedMessage, levelStr, timeBuffer);
 
-        for (auto &output : outputs)
-        {
+        logBuffer.push_back(formattedMessage);
 
-            if (dynamic_cast<ConsoleOutput *>(output.get()))
+        for (size_t i = 0; i < outputs.size(); i++)
+        {
+            if (dynamic_cast<ConsoleOutput *>(outputs[i].get()))
             {
-                output->write(formattedMessage, level);
+                outputs[i]->write(formattedMessage, level);
             }
             else
             {
-                output->write(formattedMessage);
+                outputs[i]->write(formattedMessage);
             }
         }
     }
+
+    RingBuffer<std::string, BUFFER_SIZE> &getLogBuffer() { return logBuffer;}
 
 private:
     Logger()
@@ -227,8 +232,9 @@ private:
         formatter = std::make_unique<SimpleLogFormatter>();
         outputs.push_back(std::make_unique<ConsoleOutput>());
     }
+    RingBuffer<std::string, BUFFER_SIZE> logBuffer;
 
-    std::vector<std::unique_ptr<LogOutput>> outputs;
+    RingBuffer<std::unique_ptr<LogOutput>, BUFFER_SIZE> outputs;
     std::unique_ptr<LogFormatter> formatter;
     LogLevel minLogLevel = LogLevel::NONE;
     std::mutex logMutex;

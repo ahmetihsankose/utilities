@@ -268,4 +268,11 @@ CMakeFiles/test.dir/main.cpp.o
  /usr/include/c++/11/mutex
  /usr/include/c++/11/bits/unique_lock.h
  /home/kose/workspace/utilities/Exception.h
+ /home/kose/workspace/utilities/RingBuffer.h
+ /usr/include/c++/11/map
+ /usr/include/c++/11/bits/stl_tree.h
+ /usr/include/c++/11/bits/node_handle.h
+ /usr/include/c++/11/bits/stl_map.h
+ /usr/include/c++/11/bits/stl_multimap.h
+ /usr/include/c++/11/bits/erase_if.h
 

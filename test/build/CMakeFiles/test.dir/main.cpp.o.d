@@ -212,4 +212,10 @@ CMakeFiles/test.dir/main.cpp.o: \
  /usr/include/c++/11/ratio /usr/include/c++/11/limits \
  /usr/include/c++/11/ctime /usr/include/c++/11/bits/parse_numbers.h \
  /usr/include/c++/11/mutex /usr/include/c++/11/bits/unique_lock.h \
- /home/kose/workspace/utilities/test/../Exception.h
+ /home/kose/workspace/utilities/test/../Exception.h \
+ /home/kose/workspace/utilities/test/../RingBuffer.h \
+ /usr/include/c++/11/map /usr/include/c++/11/bits/stl_tree.h \
+ /usr/include/c++/11/bits/node_handle.h \
+ /usr/include/c++/11/bits/stl_map.h \
+ /usr/include/c++/11/bits/stl_multimap.h \
+ /usr/include/c++/11/bits/erase_if.h

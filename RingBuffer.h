@@ -13,10 +13,10 @@ class RingBuffer
 {
 public:
     // Add an element to the back of the buffer
-    void push_back(const T &value)
+    void push_back(T value) // TODO: There is a bug here, size() is not true
     {
         std::lock_guard<std::mutex> lock(mtx);
-        buffer[end] = value;
+        buffer[end] = std::move(value);
         end = (end + 1) % BufferSize;
 
         // If the buffer is full, overwrite the oldest element
@@ -29,8 +29,11 @@ public:
     // Return the number of elements in the buffer
     size_t size() const
     {
-        std::lock_guard<std::mutex> lock(mtx);
-        if (end >= start)
+        if (end == start)
+        {
+            return 0;
+        }
+        else if (end >= start)
         {
             return end - start;
         }
@@ -51,8 +54,26 @@ public:
         return buffer[start];
     }
 
+    // Access the last element in the buffer
+    T back() const
+    {
+        std::lock_guard<std::mutex> lock(mtx);
+        if (size() == 0)
+        {
+            throw std::out_of_range("Buffer is empty");
+        }
+        return buffer[(end - 1 + BufferSize) % BufferSize];
+    }
+
     // Access an element in the buffer by index
-    T operator[](size_t index) const
+    T &operator[](size_t index)
+    {
+        std::lock_guard<std::mutex> lock(mtx);
+        return buffer[(start + index) % BufferSize];
+    }
+
+    // Access an element in the buffer by index, const version
+    const T &operator[](size_t index) const
     {
         std::lock_guard<std::mutex> lock(mtx);
         return buffer[(start + index) % BufferSize];
