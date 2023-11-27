@@ -1,3 +1,0 @@
-/home/kose/workspace/utilities/test/build/CMakeFiles/test.dir
-/home/kose/workspace/utilities/test/build/CMakeFiles/edit_cache.dir
-/home/kose/workspace/utilities/test/build/CMakeFiles/rebuild_cache.dir

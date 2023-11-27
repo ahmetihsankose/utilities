@@ -7,6 +7,7 @@
 #include <array>
 #include <map>
 #include <mutex>
+#include <vector>
 
 template <typename T, size_t BufferSize>
 class RingBuffer

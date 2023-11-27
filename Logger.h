@@ -15,6 +15,7 @@
 #include <mutex>
 #include "Exception.h"
 #include "RingBuffer.h"
+#include <functional>
 
 #define BUFFER_SIZE 64
 #define CONSOLE_DEBUG 1
@@ -148,10 +149,18 @@ std::string format_string(const std::string &message, Args &&...args)
 class Logger
 {
 public:
+    using CallbackType = std::function<void(const std::string &)>;
+
     static Logger &getInstance()
     {
         static Logger instance;
         return instance;
+    }
+
+    void setCallback(CallbackType callback)
+    {
+        std::lock_guard<std::mutex> lock(logMutex);
+        this->callback = std::move(callback);
     }
 
     void setFormatter(std::unique_ptr<LogFormatter> formatter)
@@ -211,6 +220,18 @@ public:
 
         logBuffer.push_back(formattedMessage);
 
+        // Call the callback if it exists
+        if (callback)
+        {
+            // unlock before calling callback to prevent potential deadlock
+            lock.unlock();
+            callback(formattedMessage);
+        }
+        else
+        {
+            lock.unlock();
+        }
+
         for (size_t i = 0; i < outputs.size(); i++)
         {
             if (dynamic_cast<ConsoleOutput *>(outputs[i].get()))
@@ -224,7 +245,7 @@ public:
         }
     }
 
-    RingBuffer<std::string, BUFFER_SIZE> &getLogBuffer() { return logBuffer;}
+    const RingBuffer<std::string, BUFFER_SIZE> &getLogBuffer() const { return logBuffer; }
 
 private:
     Logger()
@@ -232,6 +253,7 @@ private:
         formatter = std::make_unique<SimpleLogFormatter>();
         outputs.push_back(std::make_unique<ConsoleOutput>());
     }
+    CallbackType callback;
     RingBuffer<std::string, BUFFER_SIZE> logBuffer;
 
     RingBuffer<std::unique_ptr<LogOutput>, BUFFER_SIZE> outputs;

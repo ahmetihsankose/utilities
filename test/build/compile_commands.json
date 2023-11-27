@@ -1,7 +1,0 @@
-[
-{
-  "directory": "/home/kose/workspace/utilities/test/build",
-  "command": "/usr/bin/c++  -I/home/kose/workspace/utilities/test/.. -std=gnu++20 -o CMakeFiles/test.dir/main.cpp.o -c /home/kose/workspace/utilities/test/main.cpp",
-  "file": "/home/kose/workspace/utilities/test/main.cpp"
-}
-]

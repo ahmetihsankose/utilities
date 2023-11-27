@@ -2,6 +2,7 @@
 #include "../Logger.h"
 #include "../RingBuffer.h"
 #include "../Exception.h"
+#define EC_MAXLEN_ADAPTERNAME    128
 
 int main()
 {
@@ -96,6 +97,18 @@ int main()
         std::cout << "[]: " << buffer[buffer.size() - 1] << std::endl;
         std::cout << "buffer size: " << buffer.size() << std::endl;
     }
+
+    std::string name = "Ihsan";
+    char desc[EC_MAXLEN_ADAPTERNAME];
+    desc[0] = 'A';
+    desc[1] = 'h';
+    desc[2] = 'm';
+    desc[3] = 'e';
+    desc[4] = 't';
+
+
+    LOG_INFO("- mName: '%s', description: '%s'", name.c_str(), desc);
+
 
     return 0;
 }
