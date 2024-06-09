@@ -122,6 +122,7 @@ public:
 
     void write(const std::string &message, LogLevel level) override
     {
+        (void)level; 
         write(message);
     }
 
@@ -160,12 +161,12 @@ public:
     void setCallback(CallbackType callback)
     {
         std::lock_guard<std::mutex> lock(logMutex);
-        this->callback = std::move(callback);
+        this->mCallback = std::move(callback);
     }
 
     void setFormatter(std::unique_ptr<LogFormatter> formatter)
     {
-        this->formatter = std::move(formatter);
+        this->mFormatter = std::move(formatter);
     }
 
     void addOutput(std::unique_ptr<LogOutput> output)
@@ -216,16 +217,16 @@ public:
         char timeBuffer[64];
         strftime(timeBuffer, sizeof(timeBuffer), "%Y-%m-%d %H:%M:%S", tm_now);
 
-        formattedMessage = formatter->format(formattedMessage, levelStr, timeBuffer);
+        formattedMessage = mFormatter->format(formattedMessage, levelStr, timeBuffer);
 
         logBuffer.push_back(formattedMessage);
 
         // Call the callback if it exists
-        if (callback)
+        if (mCallback)
         {
             // unlock before calling callback to prevent potential deadlock
             lock.unlock();
-            callback(formattedMessage);
+            mCallback(formattedMessage);
         }
         else
         {
@@ -250,14 +251,14 @@ public:
 private:
     Logger()
     {
-        formatter = std::make_unique<SimpleLogFormatter>();
+        mFormatter = std::make_unique<SimpleLogFormatter>();
         outputs.push_back(std::make_unique<ConsoleOutput>());
     }
-    CallbackType callback;
+    CallbackType mCallback;
     RingBuffer<std::string, BUFFER_SIZE> logBuffer;
 
     RingBuffer<std::unique_ptr<LogOutput>, BUFFER_SIZE> outputs;
-    std::unique_ptr<LogFormatter> formatter;
+    std::unique_ptr<LogFormatter> mFormatter;
     LogLevel minLogLevel = LogLevel::NONE;
     std::mutex logMutex;
 

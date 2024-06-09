@@ -11,17 +11,17 @@ class Exception : public std::exception
 {
 public:
     explicit Exception(const std::string &message)
-        : message(message)
+        : mMessage(message)
     {
     }
 
     const char *what() const noexcept override
     {
-        return message.c_str();
+        return mMessage.c_str();
     }
 
 private:
-    std::string message;
+    std::string mMessage;
 };
 
 class ConsoleOutputWriteException : public Exception
