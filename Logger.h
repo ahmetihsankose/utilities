@@ -140,10 +140,17 @@ std::string format_string(const std::string &message, Args &&...args)
     }
     else
     {
-        int size = snprintf(nullptr, 0, message.c_str(), args...) + 1;
-        std::unique_ptr<char[]> buf(new char[size]);
-        snprintf(buf.get(), size, message.c_str(), args...);
-        return std::string(buf.get(), buf.get() + size - 1);
+        int size = std::snprintf(nullptr, 0, message.c_str(), std::forward<Args>(args)...);
+        if (size < 0)
+        {
+            throw std::runtime_error("Error during formatting.");
+        }
+        
+        size_t buf_size = static_cast<size_t>(size) + 1;
+        std::unique_ptr<char[]> buf(new char[buf_size]);
+        
+        std::snprintf(buf.get(), buf_size, message.c_str(), std::forward<Args>(args)...);
+        return std::string(buf.get(), buf.get() + size);
     }
 }
 
@@ -273,3 +280,4 @@ private:
 #define LOG_ERROR(...) LOG(LogLevel::ERROR, __VA_ARGS__)
 
 #define LOG_FILE(filename) Logger::getInstance().addOutput(std::make_unique<FileOutput>(filename))
+
