@@ -108,12 +108,13 @@ public:
     {
         if (!logFile.is_open())
         {
-            throw std::runtime_error("Lof file cannot be opened : " + filename);
+            throw std::runtime_error("Log file cannot be opened : " + filename);
         }
     }
 
     void write(const std::string &message) override
     {
+        std::lock_guard<std::mutex> lock(fileMutex);
         if (!(logFile << message << std::endl))
         {
             throw FileOutputWriteException("Failed to write message to log file");
@@ -122,12 +123,13 @@ public:
 
     void write(const std::string &message, LogLevel level) override
     {
-        (void)level; 
+        (void)level;
         write(message);
     }
 
 private:
     std::ofstream logFile;
+    std::mutex fileMutex;
 };
 
 // Add this helper function to format the message string with the provided arguments
