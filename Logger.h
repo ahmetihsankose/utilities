@@ -20,6 +20,8 @@
 #define BUFFER_SIZE 64
 #define CONSOLE_DEBUG 1
 
+static std::mutex logMutex;
+
 class Logger;
 
 enum class LogLevel
@@ -114,7 +116,7 @@ public:
 
     void write(const std::string &message) override
     {
-        std::lock_guard<std::mutex> lock(fileMutex);
+        std::lock_guard<std::mutex> lock(logMutex);
         if (!(logFile << message << std::endl))
         {
             throw FileOutputWriteException("Failed to write message to log file");
@@ -129,7 +131,6 @@ public:
 
 private:
     std::ofstream logFile;
-    std::mutex fileMutex;
 };
 
 // Add this helper function to format the message string with the provided arguments
@@ -269,7 +270,6 @@ private:
     RingBuffer<std::unique_ptr<LogOutput>, BUFFER_SIZE> outputs;
     std::unique_ptr<LogFormatter> mFormatter;
     LogLevel minLogLevel = LogLevel::NONE;
-    std::mutex logMutex;
 
     Logger(const Logger &) = delete;
     Logger &operator=(const Logger &) = delete;
