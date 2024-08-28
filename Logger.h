@@ -148,10 +148,10 @@ std::string format_string(const std::string &message, Args &&...args)
         {
             throw std::runtime_error("Error during formatting.");
         }
-
+        
         size_t buf_size = static_cast<size_t>(size) + 1;
         std::unique_ptr<char[]> buf(new char[buf_size]);
-
+        
         std::snprintf(buf.get(), buf_size, message.c_str(), std::forward<Args>(args)...);
         return std::string(buf.get(), buf.get() + size);
     }
@@ -223,9 +223,7 @@ public:
 
         auto now = std::chrono::system_clock::now();
         auto time_t_now = std::chrono::system_clock::to_time_t(now);
-        std::tm tm_now;
-        std::lock_guard<std::mutex> timeLock(logMutex);
-        localtime_r(&time_t_now, &tm_now);
+        auto tm_now = std::localtime(&time_t_now);
         char timeBuffer[64];
         strftime(timeBuffer, sizeof(timeBuffer), "%Y-%m-%d %H:%M:%S", tm_now);
 
@@ -284,3 +282,4 @@ private:
 #define LOG_ERROR(...) LOG(LogLevel::ERROR, __VA_ARGS__)
 
 #define LOG_FILE(filename) Logger::getInstance().addOutput(std::make_unique<FileOutput>(filename))
+
