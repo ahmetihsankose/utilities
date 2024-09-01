@@ -143,19 +143,18 @@ std::string format_string(const std::string &message, Args &&...args)
     }
     else
     {
-        int size = std::snprintf(nullptr, 0, message.c_str(), std::forward<Args>(args)...);
-        if (size < 0)
+        int size = snprintf(nullptr, 0, message.c_str(), args...) + 1;
+        if (size <= 0)
         {
             throw std::runtime_error("Error during formatting.");
         }
-        
-        size_t buf_size = static_cast<size_t>(size) + 1;
-        std::unique_ptr<char[]> buf(new char[buf_size]);
-        
-        std::snprintf(buf.get(), buf_size, message.c_str(), std::forward<Args>(args)...);
-        return std::string(buf.get(), buf.get() + size);
+        auto bufferSize = static_cast<size_t>(size);
+        std::unique_ptr<char[]> buf(new char[bufferSize]);
+        snprintf(buf.get(), bufferSize, message.c_str(), args...);
+        return std::string(buf.get(), buf.get() + bufferSize - 1);
     }
 }
+
 
 class Logger
 {
@@ -223,18 +222,17 @@ public:
 
         auto now = std::chrono::system_clock::now();
         auto time_t_now = std::chrono::system_clock::to_time_t(now);
-        auto tm_now = std::localtime(&time_t_now);
+        struct tm tm_now;
+        localtime_r(&time_t_now, &tm_now);
         char timeBuffer[64];
-        strftime(timeBuffer, sizeof(timeBuffer), "%Y-%m-%d %H:%M:%S", tm_now);
+        strftime(timeBuffer, sizeof(timeBuffer), "%Y-%m-%d %H:%M:%S", &tm_now);
 
         formattedMessage = mFormatter->format(formattedMessage, levelStr, timeBuffer);
 
         logBuffer.push_back(formattedMessage);
 
-        // Call the callback if it exists
         if (mCallback)
         {
-            // unlock before calling callback to prevent potential deadlock
             lock.unlock();
             mCallback(formattedMessage);
         }
@@ -282,4 +280,3 @@ private:
 #define LOG_ERROR(...) LOG(LogLevel::ERROR, __VA_ARGS__)
 
 #define LOG_FILE(filename) Logger::getInstance().addOutput(std::make_unique<FileOutput>(filename))
-
