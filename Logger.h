@@ -70,6 +70,7 @@ class ConsoleOutput : public LogOutput
 public:
     void write(const std::string &message) override
     {
+        std::lock_guard<std::mutex> lock(consoleMutex);
         if (!(std::cout << message << std::endl))
         {
             throw ConsoleOutputWriteException("Failed to write message to console");
@@ -97,9 +98,13 @@ public:
             colorCode = "\033[0m"; // Reset
         }
 #if CONSOLE_DEBUG
+        std::lock_guard<std::mutex> lock(consoleMutex);
         std::cout << colorCode << message << "\033[0m" << std::endl; // Reset color after message
 #endif
     }
+
+private:
+    std::mutex consoleMutex;
 };
 
 class FileOutput : public LogOutput
@@ -143,18 +148,19 @@ std::string format_string(const std::string &message, Args &&...args)
     }
     else
     {
-        int size = snprintf(nullptr, 0, message.c_str(), args...) + 1;
-        if (size <= 0)
+        int size = std::snprintf(nullptr, 0, message.c_str(), std::forward<Args>(args)...);
+        if (size < 0)
         {
             throw std::runtime_error("Error during formatting.");
         }
-        auto bufferSize = static_cast<size_t>(size);
-        std::unique_ptr<char[]> buf(new char[bufferSize]);
-        snprintf(buf.get(), bufferSize, message.c_str(), args...);
-        return std::string(buf.get(), buf.get() + bufferSize - 1);
+
+        size_t buf_size = static_cast<size_t>(size) + 1;
+        std::unique_ptr<char[]> buf(new char[buf_size]);
+
+        std::snprintf(buf.get(), buf_size, message.c_str(), std::forward<Args>(args)...);
+        return std::string(buf.get(), buf.get() + size);
     }
 }
-
 
 class Logger
 {
@@ -233,12 +239,7 @@ public:
 
         if (mCallback)
         {
-            lock.unlock();
             mCallback(formattedMessage);
-        }
-        else
-        {
-            lock.unlock();
         }
 
         for (size_t i = 0; i < outputs.size(); i++)
